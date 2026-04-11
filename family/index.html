@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/family/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Clarks | owlex.dev</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --sage: #8faa8c;
+            --sage-light: #b5c9b3;
+            --sage-dark: #6b8a68;
+            --blush: #e8b4b8;
+            --blush-light: #f2d0d3;
+            --blush-dark: #d4929a;
+            --cream: #faf5ef;
+            --warm-gray: #d5cec7;
+            --soft-white: #fdfcfa;
+            --text: #4a4a4a;
+            --text-light: #7a7a7a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* Click hearts container */
+        .click-heart {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1.5rem;
+            z-index: 1000;
+            animation: floatUp 1.5s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.5) rotate(20deg); }
+        }
+
+        /* Floating background elements */
+        .floating-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .float-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: floatAround 20s ease-in-out infinite;
+        }
+
+        .float-shape:nth-child(1) {
+            width: 300px; height: 300px;
+            background: var(--blush);
+            top: 10%; left: -5%;
+            animation-duration: 25s;
+        }
+        .float-shape:nth-child(2) {
+            width: 200px; height: 200px;
+            background: var(--sage);
+            top: 60%; right: -3%;
+            animation-duration: 20s;
+            animation-delay: -5s;
+        }
+        .float-shape:nth-child(3) {
+            width: 150px; height: 150px;
+            background: var(--blush-light);
+            bottom: 10%; left: 30%;
+            animation-duration: 22s;
+            animation-delay: -10s;
+        }
+
+        @keyframes floatAround {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -20px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(15px, 10px) scale(1.02); }
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Nav */
+        nav {
+            padding: 24px 0;
+            text-align: center;
+        }
+        nav a {
+            color: var(--sage-dark);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: color 0.3s;
+        }
+        nav a:hover { color: var(--blush-dark); }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 40px 0 50px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 600;
+            color: var(--sage-dark);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 .heart-beat {
+            display: inline-block;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.1); }
+            60% { transform: scale(1); }
+        }
+
+        .hero .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.15rem;
+            color: var(--blush-dark);
+            margin-bottom: 40px;
+        }
+
+        /* Photo frame */
+        .photo-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .photo-frame {
+            position: relative;
+            width: 340px;
+            max-width: 80vw;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(107, 138, 104, 0.2),
+                        0 8px 24px rgba(0,0,0,0.08);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .photo-frame:hover {
+            transform: scale(1.02) rotate(-1deg);
+            box-shadow: 0 30px 80px rgba(107, 138, 104, 0.25),
+                        0 12px 32px rgba(0,0,0,0.1);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            display: block;
+        }
+
+        .photo-border {
+            position: absolute;
+            inset: -4px;
+            border-radius: 28px;
+            border: 3px solid var(--blush-light);
+            pointer-events: none;
+        }
+
+        /* Decorative elements around photo */
+        .deco-star {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: twinkle 3s ease-in-out infinite;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.3s;
+            z-index: 2;
+        }
+        .deco-star:hover { transform: scale(1.5) rotate(20deg) !important; }
+
+        .deco-star:nth-child(2) { top: -15px; right: -15px; animation-delay: 0s; }
+        .deco-star:nth-child(3) { bottom: 20px; left: -20px; animation-delay: 1s; }
+        .deco-star:nth-child(4) { top: 40%; right: -25px; animation-delay: 2s; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.7; transform: scale(1) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(10deg); }
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 60px 0;
+            color: var(--blush);
+            font-size: 0.8rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            height: 1px;
+            width: 80px;
+            background: linear-gradient(90deg, transparent, var(--warm-gray), transparent);
+        }
+
+        /* Fun facts cards */
+        .facts-section h2 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--sage-dark);
+            margin-bottom: 32px;
+        }
+
+        .facts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .fact-card {
+            background: var(--soft-white);
+            border: 1px solid rgba(143, 170, 140, 0.15);
+            border-radius: 16px;
+            padding: 28px 24px;
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .fact-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(143, 170, 140, 0.15);
+            border-color: var(--sage-light);
+        }
+
+        .fact-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .fact-emoji {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 12px;
+            transition: transform 0.3s;
+        }
+
+        .fact-card:hover .fact-emoji {
+            transform: scale(1.2);
+        }
+
+        .fact-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--sage-dark);
+            margin-bottom: 6px;
+        }
+
+        .fact-card p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Hidden message on card click */
+        .fact-card .secret {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--blush-light);
+            font-size: 0.8rem;
+            color: var(--blush-dark);
+            font-style: italic;
+        }
+
+        .fact-card.revealed .secret {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Love meter */
+        .love-meter {
+            background: var(--soft-white);
+            border: 1px solid rgba(232, 180, 184, 0.2);
+            border-radius: 20px;
+            padding: 36px 32px;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .love-meter h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--sage-dark);
+            margin-bottom: 20px;
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 24px;
+            background: var(--cream);
+            border-radius: 100px;
+            overflow: hidden;
+            border: 1px solid var(--warm-gray);
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--sage-light), var(--blush), var(--blush-dark));
+            border-radius: 100px;
+            transition: width 2s ease-out;
+            position: relative;
+        }
+
+        .meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .meter-label {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: var(--blush-dark);
+            font-weight: 500;
+        }
+
+        .meter-btn {
+            margin-top: 20px;
+            padding: 10px 28px;
+            border: 2px solid var(--blush);
+            background: transparent;
+            color: var(--blush-dark);
+            border-radius: 100px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .meter-btn:hover {
+            background: var(--blush);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Hug counter */
+        .hug-section {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .hug-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--sage-light);
+            background: var(--soft-white);
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(143, 170, 140, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hug-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--sage);
+            box-shadow: 0 12px 36px rgba(143, 170, 140, 0.25);
+        }
+
+        .hug-btn:active {
+            transform: scale(0.95);
+        }
+
+        .hug-btn.squeeze {
+            animation: squeeze 0.4s ease;
+        }
+
+        @keyframes squeeze {
+            0% { transform: scale(1); }
+            30% { transform: scale(0.85) rotate(-5deg); }
+            60% { transform: scale(1.15) rotate(3deg); }
+            100% { transform: scale(1); }
+        }
+
+        .hug-count {
+            margin-top: 16px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--sage-dark);
+        }
+
+        .hug-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 0 40px;
+            border-top: 1px solid rgba(213, 206, 199, 0.5);
+            margin-top: 40px;
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        footer a {
+            color: var(--sage-dark);
+            text-decoration: none;
+        }
+        footer a:hover { color: var(--blush-dark); }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2.4rem; }
+            .facts-grid { grid-template-columns: 1fr; }
+            .photo-frame { width: 280px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-bg">
+        <div class="float-shape"></div>
+        <div class="float-shape"></div>
+        <div class="float-shape"></div>
+    </div>
+
+    <div class="container">
+        <nav>
+            <a href="/">&larr; back to owlex.dev</a>
+        </nav>
+
+        <div class="hero">
+            <h1>The Clarks <span class="heart-beat" title="Click me!">&#x1F49B;</span></h1>
+            <p class="subtitle">a little family with a whole lot of love</p>
+
+            <div class="photo-wrapper">
+                <div class="photo-frame">
+                    <img src="family.jpg" alt="The Clark Family">
+                    <div class="photo-border"></div>
+                </div>
+                <span class="deco-star">&#x2728;</span>
+                <span class="deco-star">&#x1F33F;</span>
+                <span class="deco-star">&#x1F338;</span>
+            </div>
+        </div>
+
+        <div class="divider">&#x1F49A;</div>
+
+        <div class="facts-section">
+            <h2>Our Little World</h2>
+            <div class="facts-grid">
+                <div class="fact-card" onclick="this.classList.toggle('revealed')">
+                    <span class="fact-emoji">&#x1F476;</span>
+                    <h3>Baby Clark</h3>
+                    <p>The tiniest human with the biggest smile</p>
+                    <p class="secret">She already runs the house and she knows it</p>
+                </div>
+                <div class="fact-card" onclick="this.classList.toggle('revealed')">
+                    <span class="fact-emoji">&#x1F469;</span>
+                    <h3>Mama Clark</h3>
+                    <p>Superhero disguised as a human being</p>
+                    <p class="secret">Running on coffee and unconditional love</p>
+                </div>
+                <div class="fact-card" onclick="this.classList.toggle('revealed')">
+                    <span class="fact-emoji">&#x1F989;</span>
+                    <h3>Papa Owl</h3>
+                    <p>Developer by day, dad jokes by night</p>
+                    <p class="secret">Will trade code reviews for baby giggles</p>
+                </div>
+                <div class="fact-card" onclick="this.classList.toggle('revealed')">
+                    <span class="fact-emoji">&#x1F3E0;</span>
+                    <h3>Our Nest</h3>
+                    <p>Where WiFi is strong and hugs are stronger</p>
+                    <p class="secret">Snack drawer is always suspiciously empty</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="love-meter">
+            <h3>Family Love Meter</h3>
+            <div class="meter-bar">
+                <div class="meter-fill" id="loveFill"></div>
+            </div>
+            <p class="meter-label" id="loveLabel">Click to measure...</p>
+            <button class="meter-btn" id="loveBtn" onclick="measureLove()">Measure Our Love</button>
+        </div>
+
+        <div class="hug-section">
+            <p style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--sage-dark); margin-bottom: 20px;">Send a Virtual Hug</p>
+            <button class="hug-btn" id="hugBtn" onclick="sendHug()">&#x1F917;</button>
+            <p class="hug-count" id="hugCount">0</p>
+            <p class="hug-label">hugs sent with love</p>
+        </div>
+
+        <footer>
+            <p>Made with love by the Clarks</p>
+            <p style="margin-top: 6px;"><a href="/">owlex.dev</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Click anywhere for floating hearts
+        document.addEventListener('click', function(e) {
+            const hearts = ['\u2764\uFE0F', '\uD83D\uDC95', '\uD83D\uDC96', '\uD83E\uDE77', '\uD83D\uDC9B', '\uD83D\uDC9A'];
+            const heart = document.createElement('div');
+            heart.className = 'click-heart';
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = e.clientX - 12 + 'px';
+            heart.style.top = e.clientY - 12 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1500);
+        });
+
+        // Love meter
+        let loveLevel = 0;
+        const messages = [
+            'Warming up... \uD83D\uDC9B',
+            'Getting cozy... \uD83E\uDD70',
+            'Hearts are glowing! \uD83D\uDC96',
+            'Love overload! \uD83D\uDC95',
+            'OFF THE CHARTS! \uD83D\uDCAB\u2764\uFE0F\uD83D\uDCAB',
+            'ERROR: Too much love to compute!! \uD83E\uDD2F\u2764\uFE0F'
+        ];
+
+        function measureLove() {
+            const fill = document.getElementById('loveFill');
+            const label = document.getElementById('loveLabel');
+
+            if (loveLevel < messages.length - 1) {
+                loveLevel++;
+            }
+
+            const percent = Math.min(20 * loveLevel + Math.random() * 15, loveLevel === messages.length - 1 ? 108 : 100);
+            fill.style.width = percent + '%';
+            label.textContent = messages[loveLevel - 1];
+
+            if (loveLevel >= messages.length - 1) {
+                document.getElementById('loveBtn').textContent = 'Max Love Reached!';
+                fill.style.width = '108%';
+            }
+        }
+
+        // Hug counter with localStorage
+        let hugs = parseInt(localStorage.getItem('clarkHugs') || '0');
+        document.getElementById('hugCount').textContent = hugs;
+
+        function sendHug() {
+            hugs++;
+            localStorage.setItem('clarkHugs', hugs);
+            document.getElementById('hugCount').textContent = hugs;
+
+            const btn = document.getElementById('hugBtn');
+            btn.classList.remove('squeeze');
+            void btn.offsetWidth; // reset animation
+            btn.classList.add('squeeze');
+
+            // Burst of hearts around the button
+            const rect = btn.getBoundingClientRect();
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'click-heart';
+                    heart.textContent = ['\uD83D\uDC95', '\uD83E\uDD17', '\u2764\uFE0F', '\uD83D\uDC9B'][Math.floor(Math.random() * 4)];
+                    heart.style.left = rect.left + Math.random() * rect.width + 'px';
+                    heart.style.top = rect.top + Math.random() * rect.height + 'px';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 1500);
+                }, i * 80);
+            }
+        }
+
+        // Animate love meter on scroll into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && loveLevel === 0) {
+                    // subtle initial fill
+                    document.getElementById('loveFill').style.width = '5%';
+                }
+            });
+        });
+        observer.observe(document.querySelector('.love-meter'));
+    </script>
+</body>
+</html>

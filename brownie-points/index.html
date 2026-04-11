@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brownie Points | owlex.dev</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(244, 114, 182, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(251, 146, 60, 0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 80%, rgba(244, 63, 94, 0.04) 0%, transparent 50%);
+            animation: drift 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, -2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 24px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fecdd3 0%, #f472b6 50%, #fb923c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #71717a;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            font-weight: 300;
+        }
+
+        .card-container {
+            position: relative;
+            width: 340px;
+            height: 420px;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 32px;
+            text-align: center;
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.3s ease;
+            cursor: grab;
+            touch-action: pan-y;
+            will-change: transform;
+        }
+
+        .card:active { cursor: grabbing; }
+
+        .card.active {
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .card.next {
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transform: scale(0.95) translateY(0px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .card.hidden {
+            z-index: 1;
+            opacity: 0;
+            transform: scale(0.9) translateY(24px);
+            pointer-events: none;
+        }
+
+        .card.exiting-left {
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+            transform: translateX(-140%) rotate(-15deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .card.exiting-right {
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+            transform: translateX(140%) rotate(15deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .card-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 24px;
+            line-height: 1;
+        }
+
+        .card-compliment {
+            font-size: 1.35rem;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+        }
+
+        .card-sub {
+            font-size: 0.85rem;
+            color: #71717a;
+            font-style: italic;
+        }
+
+        .hint {
+            margin-top: 32px;
+            font-size: 0.75rem;
+            color: #3f3f46;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .hint span { 
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #52525b;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s;
+            z-index: 10;
+        }
+
+        .back-link:hover { color: #a1a1aa; }
+
+        .share-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #71717a;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            padding: 10px 18px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .share-btn:hover {
+            background: rgba(244, 114, 182, 0.1);
+            color: #f472b6;
+            border-color: rgba(244, 114, 182, 0.2);
+        }
+
+        @media (max-width: 400px) {
+            .card-container { width: 300px; height: 380px; }
+            .card-compliment { font-size: 1.15rem; }
+            .header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <a href="/" class="back-link">&larr; owlex.dev</a>
+
+    <div class="app">
+        <div class="header">
+            <h1>Brownie Points</h1>
+            <p>Swipe for a compliment worth sharing</p>
+        </div>
+
+        <div class="card-container" id="cardContainer"></div>
+
+        <p class="hint"><span>&larr; swipe &rarr;</span></p>
+    </div>
+
+    <button class="share-btn" id="shareBtn">Copy compliment</button>
+
+    <script>
+    const compliments = [
+        { emoji: "✨", text: "You make even the ordinary feel magical.", sub: "Seriously, how do you do that?" },
+        { emoji: "☀️", text: "Waking up next to you is my favorite part of every day.", sub: "Even before coffee." },
+        { emoji: "🧠", text: "Your mind is one of the most beautiful things about you.", sub: "And the competition is steep." },
+        { emoji: "💃", text: "You could walk into any room and own it without trying.", sub: "It's honestly unfair." },
+        { emoji: "🌸", text: "You somehow get more beautiful with time.", sub: "Are you aging in reverse?" },
+        { emoji: "🔥", text: "You are the perfect combination of sweet and dangerous.", sub: "And I'm here for it." },
+        { emoji: "🫶", text: "The way you love people makes me want to be a better person.", sub: "You raise the bar just by being you." },
+        { emoji: "😂", text: "Your laugh is my favorite sound in the entire world.", sub: "I'd do anything to hear it." },
+        { emoji: "🏠", text: "Home isn't a place for me. It's wherever you are.", sub: "Cheesy? Sure. True? Absolutely." },
+        { emoji: "🌙", text: "Even after all this time, I still get butterflies.", sub: "You have that effect." },
+        { emoji: "👑", text: "You handle everything with so much grace. It's inspiring.", sub: "I don't say that enough." },
+        { emoji: "💐", text: "You deserve flowers every single day.", sub: "This is my digital bouquet for now." },
+        { emoji: "🎯", text: "Marrying you was the single best decision I've ever made.", sub: "And I've made some great ones." },
+        { emoji: "🌊", text: "Your calm energy is like a wave I never want to stop riding.", sub: "You ground me." },
+        { emoji: "🍫", text: "You're sweeter than anything I could ever give you.", sub: "Including actual brownies." },
+        { emoji: "🪄", text: "I don't know how you juggle everything and still glow.", sub: "You're literally magic." },
+        { emoji: "💎", text: "You are rare. Like, once-in-a-lifetime rare.", sub: "And you chose me. Wild." },
+        { emoji: "🎶", text: "If you were a song, you'd be the one stuck in my head forever.", sub: "And I'd never skip it." },
+        { emoji: "🌅", text: "Every sunset reminds me of how warm you make me feel.", sub: "Corny but real." },
+        { emoji: "🦋", text: "You turned my whole world into something beautiful.", sub: "And you didn't even have to try." },
+        { emoji: "📖", text: "Our story is my favorite one ever written.", sub: "And we're still adding chapters." },
+        { emoji: "🧁", text: "You make everything around you a little more delicious.", sub: "Life just tastes better with you." },
+        { emoji: "🌻", text: "You light up even my darkest days.", sub: "Like a human sunflower." },
+        { emoji: "🫣", text: "Sometimes I look at you and still can't believe you're real.", sub: "Pinch me." },
+        { emoji: "🛡️", text: "I feel safe with you in a way I can't explain.", sub: "You're my favorite place to land." },
+        { emoji: "🤝", text: "You're not just my wife. You're my best friend.", sub: "The kind of friend everyone wishes they had." },
+        { emoji: "🍷", text: "You only get better with time.", sub: "Like fine wine, but prettier." },
+        { emoji: "🗺️", text: "I'd go anywhere as long as you're next to me.", sub: "Literally. Name the place." },
+        { emoji: "🧲", text: "I'm still completely drawn to you.", sub: "It's like gravity but better." },
+        { emoji: "🎁", text: "Every day with you feels like a gift I didn't earn.", sub: "But I'll keep unwrapping it." },
+    ];
+
+    // Shuffle using Fisher-Yates
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    let deck = shuffle(compliments);
+    let currentIndex = 0;
+    const container = document.getElementById('cardContainer');
+    const shareBtn = document.getElementById('shareBtn');
+
+    function createCard(data, className) {
+        const card = document.createElement('div');
+        card.className = 'card ' + className;
+        card.innerHTML = `
+            <div class="card-emoji">${data.emoji}</div>
+            <div class="card-compliment">${data.text}</div>
+            <div class="card-sub">${data.sub}</div>
+        `;
+        return card;
+    }
+
+    function getCompliment(index) {
+        return deck[index % deck.length];
+    }
+
+    function renderCards() {
+        container.innerHTML = '';
+        const hidden = createCard(getCompliment(currentIndex + 2), 'hidden');
+        const next = createCard(getCompliment(currentIndex + 1), 'next');
+        const active = createCard(getCompliment(currentIndex), 'active');
+        container.appendChild(hidden);
+        container.appendChild(next);
+        container.appendChild(active);
+        setupSwipe(active);
+    }
+
+    function advance(direction) {
+        const active = container.querySelector('.card.active');
+        if (!active) return;
+        active.classList.remove('active');
+        active.classList.add(direction === 'left' ? 'exiting-left' : 'exiting-right');
+
+        const next = container.querySelector('.card.next');
+        if (next) {
+            next.classList.remove('next');
+            next.classList.add('active');
+            setupSwipe(next);
+        }
+
+        const hidden = container.querySelector('.card.hidden');
+        if (hidden) {
+            hidden.classList.remove('hidden');
+            hidden.classList.add('next');
+        }
+
+        currentIndex++;
+
+        // Reshuffle when we loop
+        if (currentIndex % deck.length === 0) {
+            deck = shuffle(compliments);
+        }
+
+        setTimeout(() => {
+            const newHidden = createCard(getCompliment(currentIndex + 2), 'hidden');
+            container.insertBefore(newHidden, container.firstChild);
+            if (active.parentNode) active.remove();
+        }, 420);
+    }
+
+    function setupSwipe(card) {
+        let startX = 0, currentX = 0, dragging = false;
+
+        function onStart(e) {
+            dragging = true;
+            startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            card.style.transition = 'none';
+        }
+
+        function onMove(e) {
+            if (!dragging) return;
+            currentX = (e.type === 'touchmove' ? e.touches[0].clientX : e.clientX) - startX;
+            const rotate = currentX * 0.08;
+            const opacity = Math.max(1 - Math.abs(currentX) / 400, 0.5);
+            card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+            card.style.opacity = opacity;
+        }
+
+        function onEnd() {
+            if (!dragging) return;
+            dragging = false;
+            card.style.transition = '';
+            if (Math.abs(currentX) > 80) {
+                advance(currentX < 0 ? 'left' : 'right');
+            } else {
+                card.style.transform = '';
+                card.style.opacity = '';
+            }
+            currentX = 0;
+        }
+
+        card.addEventListener('mousedown', onStart);
+        card.addEventListener('touchstart', onStart, { passive: true });
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchmove', onMove, { passive: true });
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchend', onEnd);
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') advance('left');
+        if (e.key === 'ArrowRight') advance('right');
+    });
+
+    // Copy current compliment
+    shareBtn.addEventListener('click', () => {
+        const c = getCompliment(currentIndex);
+        const text = `${c.emoji} ${c.text} ${c.sub}`;
+        navigator.clipboard.writeText(text).then(() => {
+            shareBtn.textContent = 'Copied!';
+            setTimeout(() => shareBtn.textContent = 'Copy compliment', 1500);
+        });
+    });
+
+    renderCards();
+    </script>
+</body>
+</html>
