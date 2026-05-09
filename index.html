@@ -4,338 +4,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alex Clark | owlex.dev</title>
+    <meta name="description" content="Alex Clark builds fast, useful web software, browser games, and developer tools.">
     <link rel="icon" type="image/png" href="/assets/images/favicon.png">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0f;
-            color: #e0e0e0;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .bg-glow {
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 40%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
-                        radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.04) 0%, transparent 50%);
-            animation: drift 20s ease-in-out infinite;
-            z-index: 0;
-        }
-
-        @keyframes drift {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(2%, -2%) rotate(1deg); }
-            66% { transform: translate(-1%, 1%) rotate(-1deg); }
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        header {
-            padding: 80px 0 60px;
-            text-align: center;
-        }
-
-        .owl-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1e1b4b, #312e81);
-            border: 2px solid rgba(99, 102, 241, 0.3);
-            box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
-            overflow: hidden;
-        }
-
-        .owl-icon img {
-            width: 52px;
-            height: 52px;
-            object-fit: contain;
-        }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 50%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .tagline {
-            font-size: 1.15rem;
-            color: #9ca3af;
-            font-weight: 300;
-            margin-bottom: 32px;
-        }
-
-        .bio {
-            max-width: 600px;
-            margin: 0 auto;
-            font-size: 1rem;
-            line-height: 1.75;
-            color: #a1a1aa;
-        }
-
-        .bio strong {
-            color: #c4b5fd;
-            font-weight: 500;
-        }
-
-        .divider {
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #6366f1, transparent);
-            margin: 60px auto;
-            border-radius: 2px;
-        }
-
-        .section-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: #6366f1;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .projects {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 80px;
-        }
-
-        .project-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 36px 32px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .project-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .project-card:hover::before {
-            opacity: 1;
-        }
-
-        .project-emoji {
-            font-size: 2rem;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        .project-card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #f0f0f0;
-        }
-
-        .project-card p {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #71717a;
-        }
-
-        .project-tag {
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 4px 10px;
-            border-radius: 100px;
-            margin-top: 16px;
-            background: var(--tag-bg);
-            color: var(--tag-color);
-        }
-
-        .card-flappy { --accent: #f472b6; --tag-bg: rgba(244, 114, 182, 0.1); --tag-color: #f472b6; }
-        .card-hecame { --accent: #34d399; --tag-bg: rgba(52, 211, 153, 0.1); --tag-color: #34d399; }
-        .card-brownie { --accent: #fb923c; --tag-bg: rgba(251, 146, 60, 0.1); --tag-color: #fb923c; }
-        .card-interview { --accent: #60a5fa; --tag-bg: rgba(96, 165, 250, 0.1); --tag-color: #60a5fa; }
-        .card-ourtube { --accent: #ef4444; --tag-bg: rgba(239, 68, 68, 0.1); --tag-color: #ef4444; }
-        .card-survival { --accent: #22d3ee; --tag-bg: rgba(34, 211, 238, 0.1); --tag-color: #22d3ee; }
-        .card-image-paste { --accent: #f59e0b; --tag-bg: rgba(245, 158, 11, 0.1); --tag-color: #f59e0b; }
-
-        .socials {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin: 0 auto 80px;
-            max-width: 720px;
-        }
-
-        .social-link {
-            display: inline-block;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            text-decoration: none;
-            color: #a1a1aa;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 100px;
-            padding: 9px 14px;
-            transition: all 0.2s ease;
-        }
-
-        .social-link:hover {
-            color: #e5e7eb;
-            border-color: rgba(99, 102, 241, 0.5);
-            background: rgba(99, 102, 241, 0.12);
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 0 60px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        footer p {
-            font-size: 0.85rem;
-            color: #52525b;
-        }
-
-        footer .owl-pun {
-            color: #6366f1;
-            font-style: italic;
-        }
-
-        @media (max-width: 640px) {
-            header { padding: 60px 0 40px; }
-            h1 { font-size: 2.2rem; }
-            .projects { grid-template-columns: 1fr; }
-            .project-card { padding: 28px 24px; }
-        }
-    </style>
+    <link rel="stylesheet" href="/assets/css/portfolio.css">
 </head>
 <body>
-    <div class="bg-glow"></div>
-    <div class="container">
-        <header>
-            <div class="owl-icon">
-                <img src="/assets/images/favicon.png" alt="Owlex">
+    <div class="page">
+        <nav class="site-nav" aria-label="Primary navigation">
+            <div class="nav-inner">
+                <a class="brand" href="/">
+                    <span class="brand-mark"><img src="/assets/images/favicon.png" alt=""></span>
+                    OWLEX_DEV
+                </a>
+                <div class="nav-links">
+                    <a class="active" href="/#projects">Projects</a>
+                    <a href="/stack/">Stack</a>
+                    <a href="/terminal/">Terminal</a>
+                    <a href="/docs/">Docs</a>
+                    <a href="/blog/">Blog</a>
+                </div>
+                <div class="nav-actions" aria-label="External links">
+                    <a class="icon-link" href="mailto:alexclark.edu@gmail.com" aria-label="Email Alex">
+                        <span class="material-symbols-outlined">terminal</span>
+                    </a>
+                    <a class="icon-link" href="https://github.com/Alyx-Clark" target="_blank" rel="noopener noreferrer" aria-label="Alex Clark on GitHub">
+                        <span class="material-symbols-outlined">code</span>
+                    </a>
+                </div>
             </div>
-            <h1>Alex Clark</h1>
-            <p class="tagline">Developer. Creator. Night Owl.</p>
-            <p class="bio">
-                I'm a developer who builds things for the web &mdash; from
-                <strong>browser-based games</strong> to full-stack applications.
-                I like making ideas real, shipping fast, and keeping things fun.
-                Welcome to my corner of the internet.
-            </p>
+        </nav>
+
+        <header class="hero">
+            <div class="container hero-inner">
+                <div>
+                    <p class="eyebrow">Alex Clark -- Full Stack Engineer</p>
+                    <h1>I build systems that just work.</h1>
+                    <p class="hero-copy">
+                        No bloated architectures, no unnecessary complexity. Just fast, reliable software,
+                        browser experiments, and developer tools engineered to be useful.
+                    </p>
+                    <div class="actions">
+                        <a class="button primary" href="#projects">View Projects</a>
+                        <a class="button secondary" href="https://github.com/Alyx-Clark" target="_blank" rel="noopener noreferrer">
+                            <span class="material-symbols-outlined">code</span>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <div class="code-window" aria-label="Decorative code sample">
+                    <div class="code-top">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span>system_init.ts</span>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="k">import</span> { Builder } <span class="k">from</span> <span class="s">"@alex/core"</span>;
+
+<span class="k">const</span> system = <span class="k">new</span> Builder({
+  focus: <span class="s">"Performance"</span>,
+  stack: [<span class="s">"JavaScript"</span>, <span class="s">"Canvas"</span>, <span class="s">"Rails"</span>],
+  complexity: <span class="k">false</span>
+});
+
+system.<span class="fn">build</span>().<span class="fn">ship</span>().<span class="fn">iterate</span>();
+
+<span class="c">// Output: useful things, live on the web.</span></code></pre>
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <div class="divider"></div>
+        <main>
+            <section class="section compact" id="projects">
+                <div class="container">
+                    <div class="section-head">
+                        <div>
+                            <p class="eyebrow">Selected Works</p>
+                            <h2 class="section-title">Projects with a pulse.</h2>
+                            <p class="section-note">A mix of playable browser games, full-stack experiments, and small tools built to remove friction.</p>
+                        </div>
+                        <a class="button secondary" href="/projects/">All Projects</a>
+                    </div>
 
-        <p class="section-title">Projects</p>
+                    <div class="marquee" aria-hidden="true">
+                        <div class="marquee-track">
+                            <span class="pill"><span class="material-symbols-outlined">javascript</span>JavaScript</span>
+                            <span class="pill"><span class="material-symbols-outlined">animation</span>Canvas</span>
+                            <span class="pill"><span class="material-symbols-outlined">sports_esports</span>Games</span>
+                            <span class="pill"><span class="material-symbols-outlined">code_blocks</span>Rails</span>
+                            <span class="pill"><span class="material-symbols-outlined">database</span>MongoDB</span>
+                            <span class="pill"><span class="material-symbols-outlined">terminal</span>PowerShell</span>
+                            <span class="pill"><span class="material-symbols-outlined">cloud</span>Firebase</span>
+                            <span class="pill"><span class="material-symbols-outlined">layers</span>Full Stack</span>
+                            <span class="pill"><span class="material-symbols-outlined">javascript</span>JavaScript</span>
+                            <span class="pill"><span class="material-symbols-outlined">animation</span>Canvas</span>
+                            <span class="pill"><span class="material-symbols-outlined">sports_esports</span>Games</span>
+                            <span class="pill"><span class="material-symbols-outlined">code_blocks</span>Rails</span>
+                            <span class="pill"><span class="material-symbols-outlined">database</span>MongoDB</span>
+                            <span class="pill"><span class="material-symbols-outlined">terminal</span>PowerShell</span>
+                            <span class="pill"><span class="material-symbols-outlined">cloud</span>Firebase</span>
+                            <span class="pill"><span class="material-symbols-outlined">layers</span>Full Stack</span>
+                        </div>
+                    </div>
 
-        <div class="projects">
-            <a href="/flappyanything" class="project-card card-flappy">
-                <span class="project-emoji">&#x1F426;</span>
-                <h3>Flappy Anything</h3>
-                <p>A customizable twist on the classic flappy game &mdash; with multiplayer lobbies, leaderboards, and themes. Pick your bird, challenge your friends.</p>
-                <span class="project-tag">Multiplayer Game</span>
-            </a>
-            <a href="/hecame" class="project-card card-hecame">
-                <span class="project-emoji">&#x2694;&#xFE0F;</span>
-                <h3>He Is Coming</h3>
-                <p>A dark, atmospheric canvas RPG with combat, bosses, inventory management, and an expanding map to explore. He's coming &mdash; are you ready?</p>
-                <span class="project-tag">RPG Adventure</span>
-            </a>
-            <a href="/brownie-points" class="project-card card-brownie">
-                <span class="project-emoji">&#x1F36B;</span>
-                <h3>Brownie Points</h3>
-                <p>Swipe through randomly generated compliments to brighten your favorite person's day. Sweet, simple, and always ready when you need one.</p>
-                <span class="project-tag">For the Wife</span>
-            </a>
-            <a href="https://github.com/Alyx-Clark/interView" target="_blank" rel="noopener noreferrer" class="project-card card-interview">
-                <span class="project-emoji">&#x1F3A5;</span>
-                <h3>interView</h3>
-                <p>A video interview practice platform with feedback flows and multi-user collaboration features, built with a full-stack web architecture.</p>
-                <span class="project-tag">Legacy Full-Stack</span>
-            </a>
-            <a href="https://github.com/Alyx-Clark/OurTube" target="_blank" rel="noopener noreferrer" class="project-card card-ourtube">
-                <span class="project-emoji">&#x1F4FA;</span>
-                <h3>OurTube</h3>
-                <p>A YouTube-inspired app featuring uploads, profiles, likes/dislikes, and comments. Originally deployed as a full-stack content platform.</p>
-                <span class="project-tag">Video Platform</span>
-            </a>
-            <a href="/another-survival" class="project-card card-survival">
-                <span class="project-emoji">&#x1F47B;</span>
-                <h3>Another Survival</h3>
-                <p>An older top-down pixel survival game with movement, combat, and atmospheric music. Built with Canvas and vanilla JavaScript and now hosted on owlex.dev.</p>
-                <span class="project-tag">Retro Canvas Game</span>
-            </a>
-            <a href="https://github.com/Alyx-Clark/claude-image-paste-wsl" target="_blank" rel="noopener noreferrer" class="project-card card-image-paste">
-                <span class="project-emoji">&#x1F5BC;&#xFE0F;</span>
-                <h3>Claude Image Paste WSL</h3>
-                <p>A tiny PowerShell helper that turns Windows clipboard screenshots into WSL-ready image paths so Claude Code can read them from the terminal.</p>
-                <span class="project-tag">Developer Tool</span>
-            </a>
-        </div>
+                    <div class="project-grid">
+                        <a class="project-card" href="/flappyanything">
+                            <div class="project-visual visual-game" data-label="&lt;Flappy_Anything /&gt;">
+                                <span class="sprite"></span>
+                                <span class="block"></span>
+                                <span class="coin"></span>
+                            </div>
+                            <div class="project-body">
+                                <h3>Flappy Anything</h3>
+                                <p>A customizable flappy game with multiplayer lobbies, leaderboards, themes, and enough chaos to keep it fun.</p>
+                                <div class="tags">
+                                    <span class="tag">JavaScript</span>
+                                    <span class="tag">Canvas</span>
+                                    <span class="tag">Firebase</span>
+                                </div>
+                            </div>
+                        </a>
 
-        <p class="section-title">Socials</p>
-        <div class="socials">
-            <a class="social-link" href="https://twitter.com/Alyx__Clark" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a class="social-link" href="https://angel.co/u/alyx-clark" target="_blank" rel="noopener noreferrer">AngelList</a>
-            <a class="social-link" href="mailto:alexclark.edu@gmail.com">Email</a>
-            <a class="social-link" href="https://github.com/Alyx-Clark" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a class="social-link" href="https://www.linkedin.com/in/alex-b-clark/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        </div>
+                        <a class="project-card" href="/hecame">
+                            <div class="project-visual visual-terminal" data-label="&lt;He_Is_Coming /&gt;">
+                                <span class="line"></span>
+                                <span class="line"></span>
+                                <span class="line"></span>
+                                <span class="line"></span>
+                            </div>
+                            <div class="project-body">
+                                <h3>He Is Coming</h3>
+                                <p>A dark canvas RPG with combat, inventory, bosses, map exploration, and a very direct sense of urgency.</p>
+                                <div class="tags">
+                                    <span class="tag">Canvas</span>
+                                    <span class="tag">RPG</span>
+                                    <span class="tag">Game Loop</span>
+                                </div>
+                            </div>
+                        </a>
 
-        <footer>
-            <p class="owl-pun">Whoooo goes there?</p>
-            <p style="margin-top: 8px;">&copy; 2026 owlex.dev</p>
+                        <a class="project-card" href="https://github.com/Alyx-Clark/claude-image-paste-wsl" target="_blank" rel="noopener noreferrer">
+                            <div class="project-visual visual-tool" data-label="&lt;WSL_Image_Paste /&gt;">
+                                <span class="panel"></span>
+                            </div>
+                            <div class="project-body">
+                                <h3>Claude Image Paste WSL</h3>
+                                <p>A tiny PowerShell helper that turns Windows clipboard screenshots into WSL-ready paths for Claude Code.</p>
+                                <div class="tags">
+                                    <span class="tag">PowerShell</span>
+                                    <span class="tag">WSL2</span>
+                                    <span class="tag">Tooling</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="container">
+                    <div class="section-head">
+                        <div>
+                            <p class="eyebrow">The Stack</p>
+                            <h2 class="section-title">Practical tools, sharp edges included.</h2>
+                        </div>
+                        <a class="button secondary" href="/stack/">Stack Notes</a>
+                    </div>
+                    <div class="stack-grid">
+                        <div class="stack-item"><span class="material-symbols-outlined">javascript</span>JavaScript</div>
+                        <div class="stack-item"><span class="material-symbols-outlined">animation</span>Canvas</div>
+                        <div class="stack-item"><span class="material-symbols-outlined">code_blocks</span>Ruby / Rails</div>
+                        <div class="stack-item"><span class="material-symbols-outlined">database</span>MongoDB</div>
+                        <div class="stack-item"><span class="material-symbols-outlined">cloud</span>Firebase</div>
+                        <div class="stack-item"><span class="material-symbols-outlined">terminal</span>PowerShell</div>
+                        <div class="stack-item"><span class="material-symbols-outlined">dns</span>Static Hosting</div>
+                        <div class="stack-item"><span class="material-symbols-outlined">add</span>Always Learning</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div><strong>&copy; 2026 SYSTEM_READY</strong> // Built static, shipped direct</div>
+                <div class="footer-links">
+                    <a href="mailto:alexclark.edu@gmail.com">Email</a>
+                    <a href="https://github.com/Alyx-Clark" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <a href="https://www.linkedin.com/in/alex-b-clark/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                </div>
+            </div>
         </footer>
     </div>
 </body>
