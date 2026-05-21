@@ -38,6 +38,87 @@ const MAP_WIDTH = 24;
 const MAP_HEIGHT = 16;
 const SAVE_KEY = "owlex_the_wild_save_v1";
 
+const palette = {
+    outline: "#153243",
+    skin: "#f1bd8d",
+    hair: "#243447",
+    shirt: "#1e6f4e",
+    pants: "#243447",
+    grass: "#7fe38c",
+    grassDark: "#48b86b",
+    path: "#d7bd83",
+    pathDark: "#b9965e",
+    water: "#68b7ef",
+    waterDark: "#3f8ed0",
+    ridge: "#84705d",
+    ridgeDark: "#5f5146",
+    fence: "#8b5e34",
+    flower: "#fcdf4c"
+};
+
+const pixelSprites = {
+    spriglet: [
+        "00011000",
+        "00133100",
+        "01333310",
+        "13366331",
+        "13666631",
+        "01366310",
+        "00133100",
+        "01100110"
+    ],
+    mossjaw: [
+        "00111100",
+        "01333310",
+        "13344331",
+        "13444431",
+        "13444431",
+        "01355310",
+        "00111100",
+        "01000010"
+    ],
+    pebblit: [
+        "00011000",
+        "00122100",
+        "01222210",
+        "12255221",
+        "12222221",
+        "01222210",
+        "00122100",
+        "01000010"
+    ],
+    flarekit: [
+        "00066000",
+        "00666100",
+        "01666610",
+        "16633561",
+        "16633661",
+        "01666610",
+        "00166100",
+        "01000010"
+    ],
+    riverbun: [
+        "01000010",
+        "01211210",
+        "12222221",
+        "12255221",
+        "12222221",
+        "01222210",
+        "00122100",
+        "01000010"
+    ]
+};
+
+const spriteColors = {
+    0: null,
+    1: palette.outline,
+    2: "#7dd3fc",
+    3: "#86efac",
+    4: "#58cc82",
+    5: "#0b1c30",
+    6: "#fcdf4c"
+};
+
 const cutsceneLines = [
     {
         speaker: "Ranger Mira",
@@ -61,6 +142,7 @@ const species = [
     {
         name: "Spriglet",
         color: "#86efac",
+        sprite: "spriglet",
         trait: "Leaf",
         maxHp: 28,
         attack: 7,
@@ -69,6 +151,7 @@ const species = [
     {
         name: "Mossjaw",
         color: "#58cc82",
+        sprite: "mossjaw",
         trait: "Bite",
         maxHp: 24,
         attack: 8,
@@ -77,6 +160,7 @@ const species = [
     {
         name: "Pebblit",
         color: "#bcc7de",
+        sprite: "pebblit",
         trait: "Stone",
         maxHp: 32,
         attack: 6,
@@ -85,6 +169,7 @@ const species = [
     {
         name: "Flarekit",
         color: "#fcdf4c",
+        sprite: "flarekit",
         trait: "Spark",
         maxHp: 22,
         attack: 9,
@@ -93,6 +178,7 @@ const species = [
     {
         name: "Riverbun",
         color: "#7dd3fc",
+        sprite: "riverbun",
         trait: "Flow",
         maxHp: 26,
         attack: 7,
@@ -141,6 +227,7 @@ function createAnimal(template, level = 1, wild = false) {
         name: template.name,
         trait: template.trait,
         color: template.color,
+        sprite: template.sprite,
         level,
         xp: 0,
         hp: maxHp,
@@ -237,38 +324,73 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawMap();
     drawPlayer();
+    drawCompanion();
     drawFieldUi();
     requestAnimationFrame(draw);
 }
 
 function drawMap() {
+    ctx.imageSmoothingEnabled = false;
     for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
             const tile = terrain[y][x];
             const px = x * TILE;
             const py = y * TILE;
-            if (tile === "~") ctx.fillStyle = "#72c4ef";
-            else if (tile === "g") ctx.fillStyle = "#63d985";
-            else if (tile === "^") ctx.fillStyle = "#8d7b68";
-            else if (tile === "#") ctx.fillStyle = "#d8e3fb";
-            else ctx.fillStyle = "#bdf2bd";
-            ctx.fillRect(px, py, TILE, TILE);
-
-            ctx.strokeStyle = "rgba(11, 28, 48, 0.06)";
-            ctx.strokeRect(px, py, TILE, TILE);
-
-            if (tile === "g") {
-                ctx.fillStyle = "rgba(0, 109, 62, 0.22)";
-                for (let blade = 0; blade < 4; blade++) {
-                    const bx = px + 8 + blade * 8;
-                    ctx.fillRect(bx, py + 16 - blade % 2 * 4, 4, 18);
-                }
-            }
+            drawTile(tile, px, py, x, y);
         }
     }
 
     drawSign(4, 12, "FIELD");
     drawSign(18, 2, "RIDGE");
+    drawFence(2, 2, 4);
+    drawFence(14, 3, 3);
+    drawTree(7, 5);
+    drawTree(20, 12);
+    drawFlowerPatch(3, 10);
+    drawFlowerPatch(15, 9);
+}
+
+function drawTile(tile, px, py, x, y) {
+    if (tile === "~") {
+        ctx.fillStyle = palette.water;
+        ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = palette.waterDark;
+        const offset = (x + y) % 2 === 0 ? 8 : 18;
+        ctx.fillRect(px + 6, py + offset, 12, 4);
+        ctx.fillRect(px + 22, py + 28 - offset / 2, 14, 4);
+    } else if (tile === "g") {
+        ctx.fillStyle = palette.grass;
+        ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = palette.grassDark;
+        for (let blade = 0; blade < 5; blade++) {
+            const bx = px + 5 + blade * 7;
+            const by = py + 12 + ((x + y + blade) % 3) * 5;
+            ctx.fillRect(bx, by, 3, 16);
+            ctx.fillRect(bx + 3, by + 4, 3, 10);
+        }
+    } else if (tile === "^") {
+        ctx.fillStyle = palette.ridge;
+        ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = palette.ridgeDark;
+        ctx.fillRect(px, py + 26, TILE, 14);
+        ctx.fillStyle = "rgba(255,255,255,0.16)";
+        ctx.fillRect(px + 5, py + 7, 18, 4);
+    } else if (tile === "#") {
+        ctx.fillStyle = palette.path;
+        ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = palette.pathDark;
+        ctx.fillRect(px + 6 + (x % 2) * 8, py + 12, 8, 4);
+        ctx.fillRect(px + 18, py + 28, 10, 4);
+    } else {
+        ctx.fillStyle = "#bdf2bd";
+        ctx.fillRect(px, py, TILE, TILE);
+        ctx.fillStyle = "rgba(72,184,107,0.24)";
+        if ((x + y) % 4 === 0) ctx.fillRect(px + 8, py + 28, 8, 4);
+        if ((x * y) % 7 === 0) ctx.fillRect(px + 26, py + 10, 6, 4);
+    }
+
+    ctx.strokeStyle = "rgba(21, 50, 67, 0.08)";
+    ctx.strokeRect(px, py, TILE, TILE);
 }
 
 function drawSign(x, y, label) {
@@ -282,18 +404,141 @@ function drawSign(x, y, label) {
     ctx.fillText(label, x * TILE + 20, y * TILE + 16);
 }
 
+function drawFence(x, y, length) {
+    ctx.fillStyle = palette.fence;
+    for (let i = 0; i < length; i++) {
+        const px = (x + i) * TILE;
+        const py = y * TILE;
+        ctx.fillRect(px + 3, py + 14, 34, 5);
+        ctx.fillRect(px + 3, py + 25, 34, 5);
+        ctx.fillRect(px + 8, py + 8, 6, 28);
+        ctx.fillRect(px + 26, py + 8, 6, 28);
+    }
+}
+
+function drawTree(x, y) {
+    const px = x * TILE;
+    const py = y * TILE;
+    ctx.fillStyle = "#76513a";
+    ctx.fillRect(px + 16, py + 18, 8, 20);
+    ctx.fillStyle = "#267b47";
+    ctx.fillRect(px + 8, py + 8, 24, 12);
+    ctx.fillRect(px + 4, py + 16, 32, 12);
+    ctx.fillRect(px + 12, py, 16, 12);
+    ctx.fillStyle = "#38a85f";
+    ctx.fillRect(px + 12, py + 6, 8, 6);
+    ctx.fillRect(px + 22, py + 18, 8, 6);
+}
+
+function drawFlowerPatch(x, y) {
+    const px = x * TILE;
+    const py = y * TILE;
+    for (let i = 0; i < 5; i++) {
+        const fx = px + 7 + i * 6;
+        const fy = py + 12 + (i % 2) * 9;
+        ctx.fillStyle = palette.grassDark;
+        ctx.fillRect(fx + 1, fy + 6, 2, 7);
+        ctx.fillStyle = i % 2 ? "#f472b6" : palette.flower;
+        ctx.fillRect(fx, fy, 4, 4);
+    }
+}
+
 function drawPlayer() {
     const x = state.player.x * TILE;
     const y = state.player.y * TILE;
-    ctx.fillStyle = "#1e293b";
-    ctx.fillRect(x + 10, y + 15, 20, 20);
-    ctx.fillStyle = "#f3bf8e";
-    ctx.beginPath();
-    ctx.arc(x + 20, y + 12, 10, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#fcdf4c";
-    ctx.fillRect(x + 10, y + 30, 8, 8);
-    ctx.fillRect(x + 22, y + 30, 8, 8);
+    drawPlayerSprite(x + 4, y + 2, state.player.facing);
+}
+
+function drawPlayerSprite(x, y, facing) {
+    const sprite = [
+        "0001111000",
+        "0012222100",
+        "0122222210",
+        "0125555210",
+        "0012222100",
+        "0003333000",
+        "0033333300",
+        "0033333300",
+        "0004440000",
+        "0040440400",
+        "0040000400",
+        "0000000000"
+    ];
+    const colors = {
+        0: null,
+        1: palette.outline,
+        2: palette.skin,
+        3: facing === "up" ? "#236049" : palette.shirt,
+        4: palette.pants,
+        5: facing === "up" ? palette.hair : "#0b1c30"
+    };
+    drawMatrix(sprite, colors, x, y, 3);
+}
+
+function drawCompanion() {
+    const partner = activeAnimal();
+    if (!partner) return;
+    const offsets = {
+        up: [0, 1],
+        down: [0, -1],
+        left: [1, 0],
+        right: [-1, 0]
+    };
+    const [ox, oy] = offsets[state.player.facing] || [1, 0];
+    const x = (state.player.x + ox) * TILE + 4;
+    const y = (state.player.y + oy) * TILE + 4;
+    if (canMove(state.player.x + ox, state.player.y + oy)) {
+        drawAnimalSpriteCanvas(partner, x, y, 4);
+    }
+}
+
+function drawAnimalSpriteCanvas(animal, x, y, scale = 4) {
+    drawMatrix(pixelSprites[animal.sprite] || pixelSprites.spriglet, animalSpritePalette(animal), x, y, scale);
+}
+
+function drawMatrix(matrix, colors, x, y, scale) {
+    matrix.forEach((row, rowIndex) => {
+        [...row].forEach((cell, colIndex) => {
+            const color = colors[cell];
+            if (!color) return;
+            ctx.fillStyle = color;
+            ctx.fillRect(x + colIndex * scale, y + rowIndex * scale, scale, scale);
+        });
+    });
+}
+
+function shade(hex, amount) {
+    const clean = hex.replace("#", "");
+    const num = parseInt(clean.length === 3 ? clean.split("").map(c => c + c).join("") : clean, 16);
+    const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 255) + amount));
+    const b = Math.max(0, Math.min(255, (num & 255) + amount));
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+function animalSpritePalette(animal) {
+    return {
+        ...spriteColors,
+        2: shade(animal.color, 22),
+        3: animal.color,
+        4: shade(animal.color, -24),
+        6: animal.trait === "Spark" ? "#fcdf4c" : "#ffffff"
+    };
+}
+
+function renderAnimalSpriteElement(element, animal) {
+    const matrix = pixelSprites[animal.sprite] || pixelSprites.spriglet;
+    const colors = animalSpritePalette(animal);
+    element.replaceChildren();
+    element.style.setProperty("--animal-color", animal.color);
+    element.style.backgroundColor = shade(animal.color, 72);
+    matrix.forEach(row => {
+        [...row].forEach(cell => {
+            const pixel = document.createElement("i");
+            pixel.style.backgroundColor = colors[cell] || "transparent";
+            element.append(pixel);
+        });
+    });
 }
 
 function drawFieldUi() {
@@ -361,11 +606,11 @@ function updateBattleUi() {
     ui.allyName.textContent = ally.name;
     ui.allyStats.textContent = `Lv ${ally.level} // ${ally.hp}/${ally.maxHp} HP`;
     ui.allyHp.style.width = `${Math.max(0, ally.hp / ally.maxHp * 100)}%`;
-    ui.allySprite.style.background = ally.color;
+    renderAnimalSpriteElement(ui.allySprite, ally);
     ui.enemyName.textContent = enemy.name;
     ui.enemyStats.textContent = `Lv ${enemy.level} // ${enemy.hp}/${enemy.maxHp} HP`;
     ui.enemyHp.style.width = `${Math.max(0, enemy.hp / enemy.maxHp * 100)}%`;
-    ui.enemySprite.style.background = enemy.color;
+    renderAnimalSpriteElement(ui.enemySprite, enemy);
 }
 
 function damage(attacker, defender) {
