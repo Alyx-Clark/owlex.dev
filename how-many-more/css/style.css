@@ -1,0 +1,235 @@
+.life-app {
+    background:
+        linear-gradient(90deg, rgba(11, 28, 48, 0.035) 1px, transparent 1px),
+        linear-gradient(rgba(11, 28, 48, 0.035) 1px, transparent 1px),
+        var(--surface);
+    background-size: 32px 32px;
+}
+
+.life-hero {
+    padding: 56px 0 40px;
+    background: linear-gradient(135deg, rgba(134, 239, 172, 0.28), rgba(211, 228, 254, 0.82));
+    border-bottom: 1px solid rgba(11, 28, 48, 0.08);
+}
+
+.life-hero-grid,
+.app-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    gap: 28px;
+    align-items: start;
+}
+
+.control-panel,
+.chart-card,
+.people-card {
+    border: 1px solid rgba(11, 28, 48, 0.14);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 16px 36px rgba(30, 41, 59, 0.08);
+}
+
+.control-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 20px;
+}
+
+label {
+    display: grid;
+    gap: 7px;
+    color: var(--ink-soft);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+input,
+select,
+button {
+    min-height: 44px;
+    width: 100%;
+    border: 1px solid rgba(11, 28, 48, 0.16);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: var(--ink);
+    font: 600 15px "Inter", system-ui, sans-serif;
+}
+
+input,
+select {
+    padding: 9px 11px;
+}
+
+button {
+    cursor: pointer;
+    background: var(--mint);
+    border-color: var(--mint);
+    font-family: "Geist", system-ui, sans-serif;
+    font-weight: 800;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+.chart-card,
+.people-card {
+    padding: 24px;
+}
+
+.chart-head,
+.people-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.chart-head h2,
+.people-head h2 {
+    margin: 0;
+    font-size: clamp(28px, 3vw, 40px);
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: end;
+    color: var(--ink-soft);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend i {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    border-radius: 2px;
+}
+
+.legend .used { background: var(--slate); }
+.legend .left { background: var(--mint); }
+
+#life-chart {
+    display: block;
+    width: 100%;
+    min-height: 360px;
+    border: 1px solid rgba(11, 28, 48, 0.12);
+    border-radius: var(--radius-sm);
+    background: #f8fbff;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.stat-grid div,
+.person-result {
+    border: 1px solid rgba(11, 28, 48, 0.1);
+    border-radius: var(--radius-sm);
+    background: rgba(239, 244, 255, 0.72);
+    padding: 12px;
+}
+
+.stat-grid span,
+.person-result span {
+    display: block;
+    color: var(--ink-soft);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.stat-grid strong,
+.person-result strong {
+    display: block;
+    margin-top: 4px;
+    font-family: "Geist", system-ui, sans-serif;
+    font-size: clamp(18px, 2.4vw, 28px);
+    line-height: 1.1;
+}
+
+.people-list {
+    display: grid;
+    gap: 14px;
+}
+
+.person {
+    border: 1px solid rgba(11, 28, 48, 0.12);
+    border-radius: var(--radius);
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.person-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.person-grid label:first-child,
+.person-result {
+    grid-column: 1 / -1;
+}
+
+.person-actions {
+    display: flex;
+    justify-content: end;
+    margin-top: 10px;
+}
+
+.remove-person {
+    width: auto;
+    min-height: 36px;
+    padding: 7px 11px;
+    background: transparent;
+    border-color: rgba(11, 28, 48, 0.16);
+    color: var(--ink-soft);
+}
+
+@media (max-width: 1020px) {
+    .life-hero-grid,
+    .app-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .control-panel {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .life-hero {
+        padding-top: 36px;
+    }
+
+    .control-panel,
+    .stat-grid,
+    .person-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-head,
+    .people-head {
+        display: block;
+    }
+
+    .legend {
+        justify-content: start;
+        margin-top: 12px;
+    }
+}
