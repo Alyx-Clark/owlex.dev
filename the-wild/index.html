@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/the-wild/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wild</title>
+    <meta name="description" content="A creature-catching browser RPG prototype by Alex Clark.">
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-shell">
+        <canvas id="game" width="960" height="640" aria-label="The Wild game canvas"></canvas>
+
+        <section id="start-menu" class="screen active">
+            <div class="menu-panel">
+                <p class="eyebrow">OWLEX_FIELD_TEST // 001</p>
+                <h1>The Wild</h1>
+                <p class="menu-copy">Track, battle, and befriend strange animals across a living field map.</p>
+                <div class="menu-actions">
+                    <button id="start-game" class="primary-button" type="button">Start Expedition</button>
+                    <button id="reset-save" class="secondary-button" type="button">Reset Save</button>
+                </div>
+                <p class="hint">Keyboard: WASD / arrows. Touch: D-pad. Backpack: B.</p>
+            </div>
+        </section>
+
+        <section id="cutscene" class="screen">
+            <div class="scene-stage">
+                <div class="portrait ranger" aria-hidden="true"></div>
+                <div class="portrait player" aria-hidden="true"></div>
+            </div>
+            <div class="dialogue-box">
+                <p id="speaker">Ranger Mira</p>
+                <div id="dialogue-text"></div>
+                <button id="next-dialogue" type="button">Continue</button>
+            </div>
+        </section>
+
+        <section id="battle" class="screen">
+            <div class="battle-card">
+                <div class="battle-stage">
+                    <div>
+                        <p class="battle-label">Your companion</p>
+                        <div id="ally-sprite" class="animal-sprite"></div>
+                        <h2 id="ally-name"></h2>
+                        <div class="bar"><span id="ally-hp"></span></div>
+                        <p id="ally-stats"></p>
+                    </div>
+                    <div>
+                        <p class="battle-label">Wild animal</p>
+                        <div id="enemy-sprite" class="animal-sprite enemy"></div>
+                        <h2 id="enemy-name"></h2>
+                        <div class="bar"><span id="enemy-hp"></span></div>
+                        <p id="enemy-stats"></p>
+                    </div>
+                </div>
+                <p id="battle-log">A wild animal appears.</p>
+                <div class="battle-actions">
+                    <button data-battle-action="attack" type="button">Attack</button>
+                    <button data-battle-action="capture" type="button">Tame</button>
+                    <button data-battle-action="item" type="button">Snack</button>
+                    <button data-battle-action="run" type="button">Run</button>
+                </div>
+            </div>
+        </section>
+
+        <aside id="hud">
+            <div>
+                <span>Partner</span>
+                <strong id="partner-name">Spriglet</strong>
+            </div>
+            <div>
+                <span>Level</span>
+                <strong id="partner-level">1</strong>
+            </div>
+            <div>
+                <span>Captured</span>
+                <strong id="capture-count">1</strong>
+            </div>
+        </aside>
+
+        <button id="inventory-button" type="button" aria-label="Open backpack">
+            <span>Backpack</span>
+        </button>
+
+        <div id="dpad" aria-label="Movement controls">
+            <button data-move="up" type="button">Up</button>
+            <button data-move="left" type="button">Left</button>
+            <button data-move="right" type="button">Right</button>
+            <button data-move="down" type="button">Down</button>
+        </div>
+
+        <section id="inventory" class="drawer" aria-label="Backpack">
+            <div class="drawer-panel">
+                <div class="drawer-head">
+                    <div>
+                        <p class="eyebrow">Backpack</p>
+                        <h2>Items & animals</h2>
+                    </div>
+                    <button id="close-inventory" type="button">Close</button>
+                </div>
+                <div class="inventory-grid">
+                    <div>
+                        <h3>Items</h3>
+                        <ul id="item-list"></ul>
+                    </div>
+                    <div>
+                        <h3>Captured animals</h3>
+                        <ul id="animal-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+</body>
+</html>
