@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Alex's Workout Dashboard</title>
+<meta name="description" content="Personal workout log and progress dashboard for Alex.">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#090b10;--panel:#11151d;--panel2:#171c26;--text:#f4f7fb;--muted:#98a2b3;
+  --line:#283142;--accent:#80e6b3;--accent2:#7bb8ff;--danger:#ff8b8b;
+}
+*{box-sizing:border-box}
+html{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+body{margin:0;min-height:100vh;background:
+radial-gradient(circle at 10% 0%,rgba(123,184,255,.08),transparent 28rem),
+radial-gradient(circle at 90% 5%,rgba(128,230,179,.08),transparent 30rem),var(--bg)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:28px 0 64px}
+.topbar{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:24px}
+.kicker{color:var(--accent);font:700 12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase}
+h1{margin:6px 0 4px;font-size:clamp(30px,5vw,52px);letter-spacing:-.04em}
+.sub{color:var(--muted);margin:0;max-width:680px}
+.badge{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:9px 12px;border-radius:999px;color:var(--muted);white-space:nowrap}
+.grid{display:grid;gap:14px}
+.stats{grid-template-columns:repeat(5,minmax(0,1fr));margin-bottom:14px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.012)),var(--panel);border:1px solid var(--line);border-radius:18px}
+.stat{padding:16px}
+.stat small{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}
+.stat strong{font-size:28px;letter-spacing:-.04em}
+.stat span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.main{grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);align-items:start}
+.section{padding:18px}
+.section h2{font-size:17px;margin:0 0 4px}
+.sectionhead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}
+.muted{color:var(--muted);font-size:13px}
+form{display:grid;gap:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:grid;gap:6px;color:#dce3ee;font-size:13px}
+input,select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:11px;background:#0c1017;color:var(--text);padding:10px 12px;outline:none}
+input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(123,184,255,.12)}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.btn{min-height:44px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 14px;font-weight:700}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04140d}
+.btn.danger{color:var(--danger)}
+.notice{min-height:20px;color:var(--muted);font-size:13px}
+.prs{display:grid;gap:10px}
+.pr{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.pr:last-child{border-bottom:0}
+.pr strong{white-space:nowrap}
+.chartwrap{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.chart{width:100%;height:190px;display:block}
+.chart text{fill:var(--muted);font-size:11px}
+.chart .axis{stroke:var(--line);stroke-width:1}
+.chart .series{fill:none;stroke:var(--accent2);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chart .dot{fill:var(--accent2)}
+.chart .area{fill:rgba(123,184,255,.08)}
+.legend{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:8px}
+.history{margin-top:14px}
+.day{padding:14px 0;border-top:1px solid var(--line)}
+.day:first-child{border-top:0;padding-top:0}
+.dayhead{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:9px}
+.dayhead h3{font-size:15px;margin:0}
+.daytotal{color:var(--muted);font-size:12px}
+.rows{display:grid;gap:6px}
+.row{display:grid;grid-template-columns:minmax(150px,1.4fr) minmax(120px,1fr) auto;gap:10px;align-items:center;padding:9px 10px;background:#0c1017;border:1px solid #1f2735;border-radius:11px}
+.row .exercise{font-weight:700}
+.row .set{color:#d2d9e5}
+.iconbtn{border:0;background:transparent;color:var(--muted);padding:8px;border-radius:8px}
+.iconbtn:hover{background:var(--panel2);color:var(--danger)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.fileinput{display:none}
+.footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:880px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stats .stat:last-child{grid-column:span 2}.main{grid-template-columns:1fr}}
+@media(max-width:560px){.wrap{width:min(100% - 18px,1180px);padding-top:18px}.topbar{align-items:flex-start;flex-direction:column}.two{grid-template-columns:1fr}.row{grid-template-columns:1fr auto}.row .set{grid-column:1}.stats{gap:9px}.stat strong{font-size:24px}.section{padding:14px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="topbar">
+    <div>
+      <div class="kicker">TRAINING_LOG // ALEX</div>
+      <h1>Workout Dashboard</h1>
+      <p class="sub">Log each set, keep your history, and watch strength, volume, reps, and cardio move over time.</p>
+    </div>
+    <div class="badge" id="lastWorkoutBadge">Last workout: Sep 28, 2026</div>
+  </header>
+
+  <section class="grid stats" aria-label="Workout totals">
+    <div class="card stat"><small>WORKOUTS</small><strong id="workoutsStat">1</strong><span>unique gym days</span></div>
+    <div class="card stat"><small>STRENGTH SETS</small><strong id="setsStat">6</strong><span>logged sets</span></div>
+    <div class="card stat"><small>STRENGTH REPS</small><strong id="repsStat">120</strong><span>total reps</span></div>
+    <div class="card stat"><small>WEIGHTED VOLUME</small><strong id="volumeStat">3,500</strong><span>lb × reps</span></div>
+    <div class="card stat"><small>CARDIO</small><strong id="cardioStat">5 min</strong><span id="distanceStat">≈ 0.21 mi</span></div>
+  </section>
+
+  <div class="grid main">
+    <div class="grid">
+      <section class="card section">
+        <div class="sectionhead">
+          <div><h2>Log a set</h2><div class="muted">One entry = one strength set or one cardio block.</div></div>
+        </div>
+        <form id="logForm">
+          <div class="two">
+            <label>Date<input id="dateInput" type="date" value="2026-09-28" required></label>
+            <label>Type<select id="typeInput"><option value="strength">Strength</option><option value="cardio">Cardio</option></select></label>
+          </div>
+          <label>Exercise<input id="exerciseInput" list="exerciseList" placeholder="Machine Bench Press" required>
+            <datalist id="exerciseList">
+              <option>Machine Bench Press</option><option>Machine Row</option><option>Leg Press</option>
+              <option>Calf Raise</option><option>Treadmill</option><option>Lat Pulldown</option>
+              <option>Shoulder Press</option><option>Leg Curl</option><option>Leg Extension</option>
+            </datalist>
+          </label>
+          <div class="two" id="strengthFields">
+            <label>Weight (lb)<input id="weightInput" type="number" min="0" step="0.5" placeholder="0"></label>
+            <label>Reps<input id="repsInput" type="number" min="1" step="1" placeholder="10"></label>
+          </div>
+          <div class="two" id="cardioFields" hidden>
+            <label>Minutes<input id="minutesInput" type="number" min=".1" step=".1" placeholder="10"></label>
+            <label>Speed (mph)<input id="speedInput" type="number" min="0" step=".1" placeholder="2.5"></label>
+          </div>
+          <div class="notice" id="formMessage" aria-live="polite"></div>
+          <div class="actions"><button class="btn primary" type="submit">Add to log</button></div>
+        </form>
+      </section>
+
+      <section class="card section">
+        <div class="sectionhead">
+          <div><h2>Workout history</h2><div class="muted">Newest workout first.</div></div>
+          <div class="toolbar">
+            <button class="btn" id="exportBtn" type="button">Export JSON</button>
+            <button class="btn" id="importBtn" type="button">Import</button>
+            <input class="fileinput" id="importFile" type="file" accept="application/json,.json">
+          </div>
+        </div>
+        <div id="history" class="history"></div>
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="card section">
+        <div class="sectionhead"><div><h2>Personal bests</h2><div class="muted">Heaviest logged set, or best unweighted rep set.</div></div></div>
+        <div id="prs" class="prs"></div>
+      </section>
+
+      <section class="card section">
+        <div class="sectionhead">
+          <div><h2>Exercise progress</h2><div class="muted">Best performance by workout date.</div></div>
+          <select id="progressExercise" aria-label="Exercise to graph"></select>
+        </div>
+        <div class="chartwrap">
+          <svg id="chart" class="chart" viewBox="0 0 560 190" role="img" aria-label="Exercise progress chart"></svg>
+          <div class="legend"><span class="muted" id="chartLabel"></span><span class="muted" id="chartHint"></span></div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <div class="sectionhead"><div><h2>Data controls</h2><div class="muted">Saved in this browser on this device.</div></div></div>
+        <p class="muted">Export a backup occasionally if you want to move your history to another browser or device.</p>
+        <button class="btn danger" id="resetBtn" type="button">Reset to Sep 28 baseline</button>
+      </section>
+    </div>
+  </div>
+
+  <p class="footer">Baseline logged from your September 28, 2026 workout. Unweighted leg press and calf raises count toward reps, but not weighted volume.</p>
+</main>
+
+<script>
+(() => {
+  const STORAGE_KEY = 'alex-workout-dashboard-v1';
+  const baseline = [
+    {id:'b1',date:'2026-09-28',type:'strength',exercise:'Machine Bench Press',weight:50,reps:15},
+    {id:'b2',date:'2026-09-28',type:'strength',exercise:'Machine Bench Press',weight:50,reps:10},
+    {id:'b3',date:'2026-09-28',type:'strength',exercise:'Machine Row',weight:60,reps:20},
+    {id:'b4',date:'2026-09-28',type:'strength',exercise:'Machine Row',weight:70,reps:15},
+    {id:'b5',date:'2026-09-28',type:'strength',exercise:'Leg Press',weight:0,reps:20},
+    {id:'b6',date:'2026-09-28',type:'strength',exercise:'Calf Raise',weight:0,reps:40},
+    {id:'b7',date:'2026-09-28',type:'cardio',exercise:'Treadmill',minutes:5,speed:2.5}
+  ];
+
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const uid = () => (crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2);
+  const fmtDate = iso => {
+    const [y,m,d] = iso.split('-').map(Number);
+    return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(y,m-1,d)));
+  };
+  const load = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return baseline.map(x=>({...x}));
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) && parsed.length ? parsed : baseline.map(x=>({...x}));
+    } catch { return baseline.map(x=>({...x})); }
+  };
+  let logs = load();
+  const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+
+  function renderStats(){
+    const strength=logs.filter(x=>x.type==='strength');
+    const cardio=logs.filter(x=>x.type==='cardio');
+    const dates=[...new Set(logs.map(x=>x.date))].sort();
+    const reps=strength.reduce((a,x)=>a+Number(x.reps||0),0);
+    const volume=strength.reduce((a,x)=>a+(Number(x.weight||0)*Number(x.reps||0)),0);
+    const minutes=cardio.reduce((a,x)=>a+Number(x.minutes||0),0);
+    const distance=cardio.reduce((a,x)=>a+(Number(x.minutes||0)/60*Number(x.speed||0)),0);
+    $('#workoutsStat').textContent=dates.length;
+    $('#setsStat').textContent=strength.length;
+    $('#repsStat').textContent=reps.toLocaleString();
+    $('#volumeStat').textContent=Math.round(volume).toLocaleString();
+    $('#cardioStat').textContent=(Math.round(minutes*10)/10)+' min';
+    $('#distanceStat').textContent='≈ '+distance.toFixed(2)+' mi';
+    $('#lastWorkoutBadge').textContent=dates.length?'Last workout: '+fmtDate(dates.at(-1)):'No workouts logged';
+  }
+
+  function renderPRs(){
+    const names=[...new Set(logs.map(x=>x.exercise))].sort();
+    $('#prs').innerHTML = names.map(name=>{
+      const items=logs.filter(x=>x.exercise===name);
+      if(items[0]?.type==='cardio'){
+        const best=[...items].sort((a,b)=>(b.minutes||0)-(a.minutes||0))[0];
+        return '<div class="pr"><span>'+esc(name)+'</span><strong>'+best.minutes+' min @ '+(best.speed||0)+' mph</strong></div>';
+      }
+      const weighted=items.filter(x=>Number(x.weight)>0);
+      if(weighted.length){
+        weighted.sort((a,b)=>b.weight-a.weight || b.reps-a.reps);
+        const best=weighted[0];
+        return '<div class="pr"><span>'+esc(name)+'</span><strong>'+best.weight+' lb × '+best.reps+'</strong></div>';
+      }
+      const best=[...items].sort((a,b)=>b.reps-a.reps)[0];
+      return '<div class="pr"><span>'+esc(name)+'</span><strong>'+best.reps+' reps</strong></div>';
+    }).join('') || '<div class="muted">No PRs yet.</div>';
+  }
+
+  function renderHistory(){
+    const dates=[...new Set(logs.map(x=>x.date))].sort().reverse();
+    $('#history').innerHTML=dates.map(date=>{
+      const day=logs.filter(x=>x.date===date);
+      const strength=day.filter(x=>x.type==='strength');
+      const vol=strength.reduce((a,x)=>a+Number(x.weight||0)*Number(x.reps||0),0);
+      const rows=day.map(x=>{
+        const detail=x.type==='strength'
+          ? (Number(x.weight)>0 ? x.weight+' lb × '+x.reps : x.reps+' reps · no added weight')
+          : x.minutes+' min @ '+(x.speed||0)+' mph';
+        return '<div class="row"><div class="exercise">'+esc(x.exercise)+'</div><div class="set">'+esc(detail)+'</div><button class="iconbtn" type="button" data-delete="'+esc(x.id)+'" aria-label="Delete '+esc(x.exercise)+' entry">Delete</button></div>';
+      }).join('');
+      return '<section class="day"><div class="dayhead"><h3>'+fmtDate(date)+'</h3><span class="daytotal">'+strength.length+' strength sets · '+Math.round(vol).toLocaleString()+' lb volume</span></div><div class="rows">'+rows+'</div></section>';
+    }).join('');
+    document.querySelectorAll('[data-delete]').forEach(btn=>btn.addEventListener('click',()=>{
+      logs=logs.filter(x=>x.id!==btn.dataset.delete); save(); renderAll();
+    }));
+  }
+
+  function progressData(name){
+    const items=logs.filter(x=>x.exercise===name);
+    if(!items.length) return {data:[],unit:''};
+    const dates=[...new Set(items.map(x=>x.date))].sort();
+    const type=items[0].type;
+    let unit='';
+    const data=dates.map(date=>{
+      const d=items.filter(x=>x.date===date);
+      if(type==='cardio'){ unit='min'; return {date,value:Math.max(...d.map(x=>Number(x.minutes||0)))}; }
+      const weighted=d.filter(x=>Number(x.weight)>0);
+      if(weighted.length){ unit='lb'; return {date,value:Math.max(...weighted.map(x=>Number(x.weight||0)))}; }
+      unit='reps'; return {date,value:Math.max(...d.map(x=>Number(x.reps||0)))};
+    });
+    return {data,unit};
+  }
+
+  function renderProgressSelect(){
+    const current=$('#progressExercise').value;
+    const names=[...new Set(logs.map(x=>x.exercise))].sort();
+    $('#progressExercise').innerHTML=names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');
+    if(names.includes(current)) $('#progressExercise').value=current;
+    else if(names.includes('Machine Bench Press')) $('#progressExercise').value='Machine Bench Press';
+    renderChart();
+  }
+
+  function renderChart(){
+    const svg=$('#chart'), name=$('#progressExercise').value;
+    const {data,unit}=progressData(name);
+    if(!data.length){svg.innerHTML='';$('#chartLabel').textContent='No data';$('#chartHint').textContent='';return;}
+    const W=560,H=190,p={l:42,r:18,t:18,b:36};
+    const max=Math.max(...data.map(d=>d.value),1), min=Math.min(...data.map(d=>d.value),0);
+    const span=Math.max(1,max-min);
+    const x=i=>data.length===1?W/2:p.l+(i*(W-p.l-p.r)/(data.length-1));
+    const y=v=>p.t+(max-v)*(H-p.t-p.b)/span;
+    const pts=data.map((d,i)=>[x(i),y(d.value)]);
+    let grid='';
+    for(let i=0;i<=4;i++){
+      const yy=p.t+i*(H-p.t-p.b)/4;
+      const val=max-i*span/4;
+      grid+='<line class="axis" x1="'+p.l+'" y1="'+yy+'" x2="'+(W-p.r)+'" y2="'+yy+'"/><text x="4" y="'+(yy+4)+'">'+(Math.round(val*10)/10)+'</text>';
+    }
+    const poly=pts.map(p=>p.join(',')).join(' ');
+    const area=pts.length>1 ? p.l+','+(H-p.b)+' '+poly+' '+(W-p.r)+','+(H-p.b) : '';
+    const labels=data.map((d,i)=>'<text x="'+x(i)+'" y="'+(H-10)+'" text-anchor="middle">'+fmtDate(d.date).replace(', 2026','')+'</text>').join('');
+    const dots=data.map((d,i)=>'<circle class="dot" cx="'+x(i)+'" cy="'+y(d.value)+'" r="5"><title>'+d.value+' '+unit+' on '+fmtDate(d.date)+'</title></circle>').join('');
+    svg.innerHTML=grid+(area?'<polygon class="area" points="'+area+'"/>':'')+'<polyline class="series" points="'+poly+'"/>'+dots+labels;
+    $('#chartLabel').textContent=(name||'Exercise')+' · '+unit;
+    $('#chartHint').textContent=data.length===1?'Baseline — log another workout to see a trend.':data.length+' workout dates';
+  }
+
+  function renderAll(){
+    renderStats(); renderPRs(); renderHistory(); renderProgressSelect();
+  }
+
+  $('#typeInput').addEventListener('change',e=>{
+    const cardio=e.target.value==='cardio';
+    $('#strengthFields').hidden=cardio; $('#cardioFields').hidden=!cardio;
+  });
+  $('#progressExercise').addEventListener('change',renderChart);
+
+  $('#logForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const date=$('#dateInput').value, type=$('#typeInput').value, exercise=$('#exerciseInput').value.trim();
+    const msg=$('#formMessage');
+    if(!date||!exercise){msg.textContent='Enter a date and exercise.';return;}
+    if(type==='strength'){
+      const weight=$('#weightInput').value===''?0:Number($('#weightInput').value);
+      const reps=Number($('#repsInput').value);
+      if(!Number.isFinite(weight)||weight<0||!Number.isInteger(reps)||reps<1){msg.textContent='Enter a valid weight and whole-number reps.';return;}
+      logs.push({id:uid(),date,type,exercise,weight,reps});
+      $('#weightInput').value=''; $('#repsInput').value='';
+    } else {
+      const minutes=Number($('#minutesInput').value), speed=Number($('#speedInput').value);
+      if(!Number.isFinite(minutes)||minutes<=0||!Number.isFinite(speed)||speed<0){msg.textContent='Enter valid minutes and speed.';return;}
+      logs.push({id:uid(),date,type,exercise,minutes,speed});
+      $('#minutesInput').value=''; $('#speedInput').value='';
+    }
+    $('#exerciseInput').value='';
+    msg.textContent='Logged.';
+    save(); renderAll();
+  });
+
+  $('#exportBtn').addEventListener('click',()=>{
+    const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),logs},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='alex-workouts.json'; a.click(); URL.revokeObjectURL(a.href);
+  });
+  $('#importBtn').addEventListener('click',()=>$('#importFile').click());
+  $('#importFile').addEventListener('change',async e=>{
+    const file=e.target.files?.[0]; if(!file)return;
+    try{
+      const parsed=JSON.parse(await file.text());
+      const incoming=Array.isArray(parsed)?parsed:parsed.logs;
+      if(!Array.isArray(incoming)||!incoming.length)throw new Error('No log entries found');
+      logs=incoming.filter(x=>x&&x.date&&x.exercise&&(x.type==='strength'||x.type==='cardio')).map(x=>({...x,id:x.id||uid()}));
+      if(!logs.length)throw new Error('No valid entries found');
+      save(); renderAll(); $('#formMessage').textContent='Workout backup imported.';
+    }catch(err){$('#formMessage').textContent='Import failed: '+err.message;}
+    e.target.value='';
+  });
+  $('#resetBtn').addEventListener('click',()=>{
+    if(!confirm('Reset this browser to the September 28 baseline workout?'))return;
+    logs=baseline.map(x=>({...x})); save(); renderAll(); $('#formMessage').textContent='Reset complete.';
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
